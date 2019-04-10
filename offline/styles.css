@@ -1,0 +1,25 @@
+body, html {
+    margin: 0;
+    background: #888;
+    height: 100%;
+    min-height: 100%;
+}
+
+.grid {
+    width: 400px;
+    height: 400px;
+    top: 50%;
+    margin-top: -200px;
+    left: 50%;
+    margin-left: -200px;
+    position: absolute;
+}
+
+.cell {
+    background: green;
+    border: 1px solid orange;
+    box-sizing: border-box;
+    float: left;
+    width: 50px;
+    height: 50px;
+}
