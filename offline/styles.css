@@ -22,4 +22,31 @@ body, html {
     float: left;
     width: 50px;
     height: 50px;
+    position: relative;
+}
+
+.cell > div {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.player {
+    width: 100%;
+    height: 100%;
+    background: purple;
+}
+
+.item {
+    height: 100%;
+    width: 100%;
+}
+.item.widget {
+    background: blue;
+}
+.item.wodget {
+    background: yellow;
+}
+.item.sprocket {
+    background: cyan;
 }

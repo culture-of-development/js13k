@@ -1,0 +1,38 @@
+Offline is the theme (interpret however you want, but make it obvious)
+latest Firefox and Chrome
+
+interpretations for Offline:
+    the internet obviously
+
+
+genres:
+    **RPG
+    FPS
+    Art
+    Puzzle
+    --RTS
+    Card
+    --text adventure
+
+components that make a game "complete":
+    story?
+    theme
+    tutorial
+    music
+    interactions
+    graphics
+
+
+
+Decisions:
+    It's an RPG where you have to collect the tools to fix the system.  As you fix parts of the system, what happens???
+    First thing you need to do is get the lights back on.
+    You need the widget, the wodget and the sproket.
+    Once it's back online, you win.
+
+    It's in an office, with desks and furniture and whatnot.  The office was broken into and the theives freaked out 
+    when the alarm went off so they started dropping pieces as they were running out.  So the pieces are not where we
+    expect them to be, they are in some random places.
+
+    There's a timer, we're losing money every second that the system is offline and the goal is to lose the least amount
+    of money.

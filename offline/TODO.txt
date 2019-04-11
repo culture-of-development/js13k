@@ -1,38 +1,16 @@
-Offline is the theme (interpret however you want, but make it obvious)
-latest Firefox and Chrome
+2019-04-12
+    make moving the player move the player object to the new cells items
+    pick up items when entering a tile that contains them
+    make inventory display
 
-interpretations for Offline:
-    the internet obviously
+2019-04-11
+    --implement a player
+    --make the player movable
+    --make a build pipeline so we can see the final size
+    --make items
+    make inventory
 
-
-genres:
-    **RPG
-    FPS
-    Art
-    Puzzle
-    --RTS
-    Card
-    --text adventure
-
-components that make a game "complete":
-    story?
-    theme
-    tutorial
-    music
-    interactions
-    graphics
-
-
-
-Decisions:
-    It's an RPG where you have to collect the tools to fix the system.  As you fix parts of the system, what happens???
-    First thing you need to do is get the lights back on.
-    You need the widget, the wodget and the sproket.
-    Once it's back online, you win.
-
-    It's in an office, with desks and furniture and whatnot.  The office was broken into and the theives freaked out 
-    when the alarm went off so they started dropping pieces as they were running out.  So the pieces are not where we
-    expect them to be, they are in some random places.
-
-    There's a timer, we're losing money every second that the system is offline and the goal is to lose the least amount
-    of money.
+2019-04-10
+    --research project
+    --decide what kind of game to make
+    --implement grid world
