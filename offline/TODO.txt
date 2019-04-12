@@ -1,7 +1,8 @@
 2019-04-12
-    make moving the player move the player object to the new cells items
-    pick up items when entering a tile that contains them
-    make inventory display
+    --make moving the player move the player object to the new cells items
+    --pick up items when entering a tile that contains them
+    --make inventory display
+    make winning condition
 
 2019-04-11
     --implement a player

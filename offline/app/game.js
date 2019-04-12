@@ -15,9 +15,11 @@ const createElement = function(tag, classnames) {
 
 const makeCells = function(height, width) {
     let cells = [];
-    for(let r = 0; r < height; r++) {
-        for(let c = 0; c < width; c++) {
-            cells.push({ 
+    for(let row = 0; row < height; row++) {
+        for(let col = 0; col < width; col++) {
+            cells.push({
+                row,
+                col,
                 items: [],
                 element: createElement("div", "cell"),
             });
@@ -27,28 +29,94 @@ const makeCells = function(height, width) {
 };
 
 const makePlayer = function(row, col) {
-    return {
+    var player = {
         row,
         col,
         element: createElement("div", "player"),
-        inventory: [],
+        inventory: {
+            items: [],
+            element: createElement("div", "inventory"),
+        },
     };
+    player.element.appendChild(player.inventory.element);
+    return player;
 }
 
 const renderPlayer = function() {
-    if (player.parentNode) {
-        player.parentNode.removeChild(player);
-    }
-    const targetLocation = player.row * grid.width + player.col;
+    unrender(player);
+    const targetLocation = getCellIndex(player);
     grid.cells[targetLocation].element.appendChild(player.element);
 };
 
+const getCellIndex = function(object, theGrid) {
+    var g = theGrid || grid;
+    return object.row * g.width + object.col;
+};
+
+const getObjectCell = function(object) {
+    return grid.cells[getCellIndex(object)];
+};
+
+const arrayRemove = function(array, item) {
+    // https://stackoverflow.com/a/5767357/178082
+    var index = array.indexOf(item);
+    if (index > -1) {
+        array.splice(index, 1);
+    }
+};
+
+const unrender = function(object) {
+    let el = object.element;
+    if (el.parentNode) {
+        el.parentNode.removeChild(el);
+    }
+}
+
+const pickUpItems = function(cell, character) {
+    let inventoryItems = character.inventory.items;
+    let inventoryElement = character.inventory.element;
+    cell.items.forEach(item => {
+        if (item === character) return;
+        item.row = 0;
+        item.col = inventoryItems.length;
+        inventoryItems.push(item);
+        unrender(item);
+        inventoryElement.appendChild(item.element);
+    });
+    inventoryItems.forEach(item => {
+        arrayRemove(cell.items, item);
+    });
+}
+
+const checkWin = function() {
+    if (player.row !== 0 || player.col !== 0) return;
+    const itemsNeeded = { "widget": false, "wodget": false, "sprocket": false };
+    player.inventory.items.forEach(item => {
+        if (itemsNeeded.hasOwnProperty(item.name)) {
+            itemsNeeded[item.name] = true;
+        }
+    })
+    let missingItems = Object.keys(itemsNeeded).filter(i => !itemsNeeded[i]);
+    console.log(missingItems);
+    if (missingItems.length === 0) {
+        setTimeout(() => alert("You have brought the system back online."), 0);
+    }
+}
+
 const handlePlayerMove = function(event) {
+    const oldCell = getObjectCell(player);
     if (event.key === "w") player.row = Math.max(0, player.row - 1);
     else if (event.key === "a") player.col = Math.max(0, player.col - 1);
     else if (event.key === "s") player.row = Math.min(grid.height - 1, player.row + 1);
     else if (event.key === "d") player.col = Math.min(grid.width - 1, player.col + 1);
+    const newCell = getObjectCell(player);
+    if (oldCell != newCell) {
+        arrayRemove(oldCell.items, player);
+        newCell.items.push(player);
+    }
+    pickUpItems(newCell, player);
     renderPlayer();
+    checkWin();
 };
 body.addEventListener("keydown", handlePlayerMove);
 
@@ -82,10 +150,10 @@ const makeGrid = function(player) {
         element: createElement("div", "grid"),
         cells: makeCells(8, 8),
     };
-    grid.cells[4 * grid.width + 4].items.push(player);
-    grid.cells[1 * grid.width + 1].items.push(makeItem(1,1,"widget"));
-    grid.cells[0 * grid.width + 6].items.push(makeItem(0,6,"wodget"));
-    grid.cells[7 * grid.width + 3].items.push(makeItem(7,3,"sprocket"));
+    grid.cells[getCellIndex({row:4,col:4}, grid)].items.push(player);
+    grid.cells[getCellIndex({row:1,col:1}, grid)].items.push(makeItem(1,1,"widget"));
+    grid.cells[getCellIndex({row:0,col:6}, grid)].items.push(makeItem(0,6,"wodget"));
+    grid.cells[getCellIndex({row:7,col:3}, grid)].items.push(makeItem(7,3,"sprocket"));
     return grid;
 };
 let player = makePlayer(4, 4);

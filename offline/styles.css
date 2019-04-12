@@ -25,6 +25,10 @@ body, html {
     position: relative;
 }
 
+.grid > .cell:first-child {
+    background: lightgreen;
+}
+
 .cell > div {
     position: absolute;
     top: 0;
@@ -40,13 +44,40 @@ body, html {
 .item {
     height: 100%;
     width: 100%;
+    font-size: 30px;
+    line-height: 50px;
+    text-align: center;
 }
-.item.widget {
-    background: blue;
+.item.widget:before {
+    content: '🔑';
 }
-.item.wodget {
-    background: yellow;
+.item.wodget:before {
+    content: '🔦';
 }
-.item.sprocket {
-    background: cyan;
+.item.sprocket:before {
+    content: '💾';
+}
+
+.inventory {
+    height: 50px;
+    width: 200px;
+    position: fixed;
+    border: 2px solid #AAA;
+    bottom: 0;
+    left: 50%;
+    margin-left: -100px;
+    background: repeating-linear-gradient(
+        90deg,
+        #AAA,
+        #AAA 2px,
+        #444 2px,
+        #444 50px
+    );
+    background-position: -1px 0px;
+}
+
+.inventory > .item {
+    height: 50px;
+    width: 50px;
+    float: left;
 }
