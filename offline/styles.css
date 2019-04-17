@@ -48,13 +48,13 @@ body, html {
     line-height: 50px;
     text-align: center;
 }
-.item.widget:before {
+.item.keys:before {
     content: '🔑';
 }
-.item.wodget:before {
+.item.flashlight:before {
     content: '🔦';
 }
-.item.sprocket:before {
+.item.data:before {
     content: '💾';
 }
 

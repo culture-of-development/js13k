@@ -36,3 +36,20 @@ Decisions:
 
     There's a timer, we're losing money every second that the system is offline and the goal is to lose the least amount
     of money.
+
+    it's basically an escape room game
+    it's nighttime outside, the power is out, but there is a window by the entrance
+    that includes some moonlight, enough to help you find a flashlight
+    there are 10 levels, 
+        some on the same floor, 
+        some accessible by stairs
+        intermediate levels are mostly smaller
+        last level is notably larger? maybe
+        consider randomizing the game levels for replayability
+    items required to perform certain interactions
+        key to open a door
+        flashlight to find the correct disk in the drawer
+    need to collect lots of data to complete the restore
+
+
+

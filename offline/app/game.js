@@ -82,6 +82,7 @@ const pickUpItems = function(cell, character) {
         inventoryItems.push(item);
         unrender(item);
         inventoryElement.appendChild(item.element);
+        playSfx(item.name);
     });
     inventoryItems.forEach(item => {
         arrayRemove(cell.items, item);
@@ -90,7 +91,7 @@ const pickUpItems = function(cell, character) {
 
 const checkWin = function() {
     if (player.row !== 0 || player.col !== 0) return;
-    const itemsNeeded = { "widget": false, "wodget": false, "sprocket": false };
+    const itemsNeeded = { "keys": false, "flashlight": false, "data": false };
     player.inventory.items.forEach(item => {
         if (itemsNeeded.hasOwnProperty(item.name)) {
             itemsNeeded[item.name] = true;
@@ -99,6 +100,7 @@ const checkWin = function() {
     let missingItems = Object.keys(itemsNeeded).filter(i => !itemsNeeded[i]);
     console.log(missingItems);
     if (missingItems.length === 0) {
+        playSfx("win");
         setTimeout(() => alert("You have brought the system back online."), 0);
     }
 }
@@ -151,9 +153,9 @@ const makeGrid = function(player) {
         cells: makeCells(8, 8),
     };
     grid.cells[getCellIndex({row:4,col:4}, grid)].items.push(player);
-    grid.cells[getCellIndex({row:1,col:1}, grid)].items.push(makeItem(1,1,"widget"));
-    grid.cells[getCellIndex({row:0,col:6}, grid)].items.push(makeItem(0,6,"wodget"));
-    grid.cells[getCellIndex({row:7,col:3}, grid)].items.push(makeItem(7,3,"sprocket"));
+    grid.cells[getCellIndex({row:1,col:1}, grid)].items.push(makeItem(1,1,"keys"));
+    grid.cells[getCellIndex({row:0,col:6}, grid)].items.push(makeItem(0,6,"flashlight"));
+    grid.cells[getCellIndex({row:7,col:3}, grid)].items.push(makeItem(7,3,"data"));
     return grid;
 };
 let player = makePlayer(4, 4);
