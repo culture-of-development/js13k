@@ -5,6 +5,36 @@ body, html {
     min-height: 100%;
 }
 
+.leaderboard {
+    position: fixed;
+    height: 100%;
+    width: 100%;
+    top: 0;
+    left: 0;
+    background: #4444AAFF;
+    z-index: 1000;
+    display: none;
+}
+.leaderboard > .play {
+    margin: 0 auto;
+    padding: 15px;
+    font-size: 100px;
+    display: block;
+    position: absolute;
+    top: 50%;
+    margin-top: -100px;
+    border-radius: 20px;
+    height: 200px;
+    left: 50%;
+    width: 400px;
+    margin-left: -200px;
+    cursor: pointer;
+}
+
+body[view="leaderboard"] > .leaderboard {
+    display: inherit;
+}
+
 .grid {
     width: 400px;
     height: 400px;
@@ -13,6 +43,7 @@ body, html {
     left: 50%;
     margin-left: -200px;
     position: absolute;
+    line-height: 50px;
 }
 
 .cell {
@@ -25,10 +56,6 @@ body, html {
     position: relative;
 }
 
-.grid > .cell:first-child {
-    background: lightgreen;
-}
-
 .cell > div {
     position: absolute;
     top: 0;
@@ -38,14 +65,18 @@ body, html {
 .player {
     width: 100%;
     height: 100%;
-    background: purple;
+    /* background: purple; */
+    font-size: 30px;
+    text-align: center;
+}
+.player:before {
+    content: '🧞';
 }
 
 .item {
     height: 100%;
     width: 100%;
     font-size: 30px;
-    line-height: 50px;
     text-align: center;
 }
 .item.keys:before {
@@ -56,6 +87,9 @@ body, html {
 }
 .item.data:before {
     content: '💾';
+}
+.item.door:before {
+    content: '🚪';
 }
 
 .inventory {
@@ -80,4 +114,61 @@ body, html {
     height: 50px;
     width: 50px;
     float: left;
+}
+
+.move-counter {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100px;
+    width: 100%;
+    text-align: center;
+    line-height: 100px;
+    font-size: 80px;
+}
+
+.dialog {
+    top: 100px;
+    position: absolute;
+    background: orange;
+    border: 2px solid darkblue;
+    border-radius: 20px;
+    padding: 50px;
+    width: 400px;
+    left: 50%;
+    margin-left: -251px;
+    z-index: 2;
+    font-size: 1.5em;
+}
+
+.dialog .avatar {
+    font-size: 70px;
+    position: absolute;
+    background: cyan;
+    border-radius: 50px;
+    width: 100px;
+    height: 100px;
+    text-align: center;
+    line-height: 100px;
+    bottom: 0;
+    margin-bottom: -50px;
+}
+
+.dialog.left .avatar {
+    left: 0;
+    margin-left: -50px;
+}
+
+.dialog.right .avatar {
+    right: 0;
+    margin-right: -50px;
+}
+
+.dialog .click-to-continue {
+    bottom: 0;
+    position: absolute;
+    text-align: center;
+    width: 100%;
+    left: 0;
+    font-size: 15px;
 }

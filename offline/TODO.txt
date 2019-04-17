@@ -1,3 +1,14 @@
+2019-04-17
+    --add graphics for player and door
+    --when you start the game, show the leaderboard
+    --click to start new game
+    --add move counter
+    --dialog view
+    --write some dialog and have it update when clicked
+    --when the game completes, show the leaderboard
+    make sound when you try to interact with a locked door
+        prevent you from reaching that cell with the door
+
 2019-04-16
     --add audio for each item
     --add audio for winning condition

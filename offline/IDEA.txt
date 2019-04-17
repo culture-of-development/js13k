@@ -17,10 +17,25 @@ genres:
 components that make a game "complete":
     story?
     theme
+
     tutorial
+        click button to start game, screen goes dark, phone ring happens
+        text to speech along with some sort of popup conversation window
+        click to continue
+        should cover some basics like
+            what you're trying to achieve
+            add some suspense w
+            where to find the first item
     music
+        --sound effects for when you pick up items and when you win
     interactions
+        --move the character
+        --pick up items
+        --only perform certain actions when you have the correct items
     graphics
+        --currently using emojis for items
+        need a door for the exit
+        need a player model for the player
 
 
 
@@ -50,6 +65,11 @@ Decisions:
         key to open a door
         flashlight to find the correct disk in the drawer
     need to collect lots of data to complete the restore
+    you were sleeping in the office and you get a phone call
+        the person on the phone tells you that the system is down
+        gives you an idea of what you need to get it back up
+        tells you where to find a flashlight which you'll need to see in
+            some of the darker areas
 
 
 
