@@ -48,12 +48,156 @@ body[view="leaderboard"] > .leaderboard {
 
 .cell {
     background: green;
-    border: 1px solid orange;
+    border: 0px solid orange;
     box-sizing: border-box;
     float: left;
     width: 50px;
     height: 50px;
     position: relative;
+    background-repeat: no-repeat;
+    background-size: 50px 50px;
+    background-image: 
+        linear-gradient(90deg, rgba(255,255,255,0.2), rgba(255,255,255,0.2) 1px, transparent 1px, transparent 48px),
+        linear-gradient(180deg, rgba(255,255,255,0.2), rgba(255,255,255,0.2) 1px, transparent 1px, transparent 48px),
+        linear-gradient(270deg, rgba(255,255,255,0.2), rgba(255,255,255,0.2) 1px, transparent 1px, transparent 48px),
+        linear-gradient(0deg, rgba(255,255,255,0.2), rgba(255,255,255,0.2) 1px, transparent 1px, transparent 48px);
+    background-position: 
+        25px 25px,
+        25px 25px,
+        -24px -24px,
+        -24px -24px;
+}
+.cell.wall-left {
+    border-left-width: 1px;
+    background-image: 
+        linear-gradient(90deg, rgba(255,255,255,0.2), rgba(255,255,255,0.2) 1px, transparent 1px, transparent 48px),
+        linear-gradient(180deg, rgba(255,255,255,0.2), rgba(255,255,255,0.2) 1px, transparent 1px, transparent 48px),
+        linear-gradient(270deg, rgba(255,255,255,0.2), rgba(255,255,255,0.2) 1px, transparent 1px, transparent 48px);
+    background-position: 
+        25px 25px,
+        25px 25px,
+        -24px -24px;
+}
+.cell.wall-right {
+    border-right-width: 1px;
+    background-image: 
+        linear-gradient(90deg, rgba(255,255,255,0.2), rgba(255,255,255,0.2) 1px, transparent 1px, transparent 48px),
+        linear-gradient(270deg, rgba(255,255,255,0.2), rgba(255,255,255,0.2) 1px, transparent 1px, transparent 48px),
+        linear-gradient(0deg, rgba(255,255,255,0.2), rgba(255,255,255,0.2) 1px, transparent 1px, transparent 48px);
+    background-position: 
+        25px 25px,
+        -24px -24px,
+        -24px -24px;
+}
+.cell.wall-top {
+    border-top-width: 1px;
+    background-image: 
+        linear-gradient(90deg, rgba(255,255,255,0.2), rgba(255,255,255,0.2) 1px, transparent 1px, transparent 48px),
+        linear-gradient(180deg, rgba(255,255,255,0.2), rgba(255,255,255,0.2) 1px, transparent 1px, transparent 48px),
+        linear-gradient(0deg, rgba(255,255,255,0.2), rgba(255,255,255,0.2) 1px, transparent 1px, transparent 48px);
+    background-position: 
+        25px 25px,
+        25px 25px,
+        -24px -24px;
+}
+.cell.wall-bottom {
+    border-bottom-width: 1px;
+    background-image: 
+        linear-gradient(180deg, rgba(255,255,255,0.2), rgba(255,255,255,0.2) 1px, transparent 1px, transparent 48px),
+        linear-gradient(270deg, rgba(255,255,255,0.2), rgba(255,255,255,0.2) 1px, transparent 1px, transparent 48px),
+        linear-gradient(0deg, rgba(255,255,255,0.2), rgba(255,255,255,0.2) 1px, transparent 1px, transparent 48px);
+    background-position: 
+        25px 25px,
+        -24px -24px,
+        -24px -24px;
+}
+.cell.wall-top.wall-left {
+    background-image: 
+        linear-gradient(90deg, rgba(255,255,255,0.2), rgba(255,255,255,0.2) 1px, transparent 1px, transparent 48px),
+        linear-gradient(180deg, rgba(255,255,255,0.2), rgba(255,255,255,0.2) 1px, transparent 1px, transparent 48px);
+    background-position: 
+        25px 25px,
+        25px 25px;
+}
+.cell.wall-top.wall-right {
+    background-image: 
+        /* bottom */ linear-gradient(90deg, rgba(255,255,255,0.2), rgba(255,255,255,0.2) 1px, transparent 1px, transparent 48px),
+        /* left */ linear-gradient(0deg, rgba(255,255,255,0.2), rgba(255,255,255,0.2) 1px, transparent 1px, transparent 48px);
+    background-position: 
+        /* bottom */ 25px 25px,
+        /* left */ -24px -24px;
+}
+.cell.wall-top.wall-bottom {
+    background-image: 
+        /* right */ linear-gradient(180deg, rgba(255,255,255,0.2), rgba(255,255,255,0.2) 1px, transparent 1px, transparent 48px),
+        /* left */ linear-gradient(0deg, rgba(255,255,255,0.2), rgba(255,255,255,0.2) 1px, transparent 1px, transparent 48px);
+    background-position: 
+        /* right */ 25px 25px,
+        /* left */ -24px -24px;
+}
+.cell.wall-right.wall-left {
+    background-image: 
+        /* bottom */ linear-gradient(90deg, rgba(255,255,255,0.2), rgba(255,255,255,0.2) 1px, transparent 1px, transparent 48px),
+        /* top */ linear-gradient(270deg, rgba(255,255,255,0.2), rgba(255,255,255,0.2) 1px, transparent 1px, transparent 48px);
+    background-position: 
+        /* bottom */ 25px 25px,
+        /* top */ -24px -24px;
+}
+.cell.wall-right.wall-bottom {
+    background-image: 
+        /* top */ linear-gradient(270deg, rgba(255,255,255,0.2), rgba(255,255,255,0.2) 1px, transparent 1px, transparent 48px),
+        /* left */ linear-gradient(0deg, rgba(255,255,255,0.2), rgba(255,255,255,0.2) 1px, transparent 1px, transparent 48px);
+    background-position: 
+        /* top */ -24px -24px,
+        /* left */ -24px -24px;
+}
+.cell.wall-left.wall-bottom {
+    background-image: 
+        /* right */ linear-gradient(180deg, rgba(255,255,255,0.2), rgba(255,255,255,0.2) 1px, transparent 1px, transparent 48px),
+        /* top */ linear-gradient(270deg, rgba(255,255,255,0.2), rgba(255,255,255,0.2) 1px, transparent 1px, transparent 48px);
+    background-position: 
+        /* right */ 25px 25px,
+        /* top */ -24px -24px;
+}
+.cell.wall-bottom.wall-top.wall-right {
+    background-image: 
+        /* left */ linear-gradient(0deg, rgba(255,255,255,0.2), rgba(255,255,255,0.2) 1px, transparent 1px, transparent 48px);
+    background-position: 
+        /* left */ -24px -24px;
+}
+.cell.wall-left.wall-top.wall-right {
+    background-image: 
+        /* bottom */ linear-gradient(90deg, rgba(255,255,255,0.2), rgba(255,255,255,0.2) 1px, transparent 1px, transparent 48px);
+    background-position: 
+        /* bottom */ 25px 25px;
+}
+.cell.wall-left.wall-bottom.wall-right {
+    background-image: 
+        /* top */ linear-gradient(270deg, rgba(255,255,255,0.2), rgba(255,255,255,0.2) 1px, transparent 1px, transparent 48px);
+    background-position: 
+        /* top */ -24px -24px;
+}
+.cell.wall-left.wall-bottom.wall-top {
+    background-image: 
+        /* right */ linear-gradient(180deg, rgba(255,255,255,0.2), rgba(255,255,255,0.2) 1px, transparent 1px, transparent 48px);
+    background-position: 
+        /* right */ 25px 25px;
+}
+.cell.wall-left.wall-bottom.wall-top.wall-right {
+    background-image: none;
+}
+
+kepp {
+background-image: 
+        /* bottom */ linear-gradient(90deg, rgba(255,255,255,0.2), rgba(255,255,255,0.2) 1px, transparent 1px, transparent 48px),
+        /* right */ linear-gradient(180deg, rgba(255,255,255,0.2), rgba(255,255,255,0.2) 1px, transparent 1px, transparent 48px),
+        /* top */ linear-gradient(270deg, rgba(255,255,255,0.2), rgba(255,255,255,0.2) 1px, transparent 1px, transparent 48px),
+        /* left */ linear-gradient(0deg, rgba(255,255,255,0.2), rgba(255,255,255,0.2) 1px, transparent 1px, transparent 48px);
+    background-position: 
+        /* bottom */ 25px 25px,
+        /* right */ 25px 25px,
+        /* top */ -24px -24px,
+        /* left */ -24px -24px;
 }
 
 .cell > div {

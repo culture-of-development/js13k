@@ -54,6 +54,7 @@ let init_audio = function() {
     loadAudio("flashlight");
     loadAudio("data");
     loadAudio("win");
+    loadAudio("door-locked");
 };
 
 audioBody.addEventListener("keypress", init_audio);

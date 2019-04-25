@@ -73,3 +73,19 @@ Decisions:
 
 
 
+5 days left
+
+interactions with items
+    implement blocking items
+
+implement the flashlight and windows
+    the world should be dark, flashlight makes it so you can see
+    respect walls, etc
+
+change the way the world is constructed
+    specify the world as an array of values, not default to just being a grid of a set size
+
+force us to get less than 13 kb
+
+last day should be building out the primary scenario
+    getting leaderboard finished

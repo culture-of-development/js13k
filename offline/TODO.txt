@@ -1,3 +1,17 @@
+2019-04-25
+    --dmake sound when you try to interact with a locked door
+    --respect walls
+    prevent you from reaching a cell with a locked door
+    --conversation pauses player control
+    --visually change the css to show allowed paths
+    --move counter always increments when key is pressed
+    not clear who the player is on the first screen
+
+2019-04-24
+    --mess with css
+    --read cards
+    --talk about graduation
+
 2019-04-17
     --add graphics for player and door
     --when you start the game, show the leaderboard
@@ -6,8 +20,6 @@
     --dialog view
     --write some dialog and have it update when clicked
     --when the game completes, show the leaderboard
-    make sound when you try to interact with a locked door
-        prevent you from reaching that cell with the door
 
 2019-04-16
     --add audio for each item

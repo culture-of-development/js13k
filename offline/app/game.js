@@ -17,12 +17,20 @@ const makeCells = function(height, width) {
     let cells = [];
     for(let row = 0; row < height; row++) {
         for(let col = 0; col < width; col++) {
-            cells.push({
+            let walls = [];
+            if (row === 0) walls.push("top");
+            if (row === height - 1) walls.push("bottom");
+            if (col === 0 || (col===4 && row < 6)) walls.push("left");
+            if (col === width - 1 || (col===3 && row < 6)) walls.push("right");
+            let cell = {
                 row,
                 col,
+                walls,
                 items: [],
                 element: createElement("div", "cell"),
-            });
+            };
+            walls.forEach(w => cell.element.classList.add("wall-" + w));
+            cells.push(cell);
         }
     }
     return cells;
@@ -99,30 +107,54 @@ const checkWin = function(cell) {
         }
     })
     let missingItems = Object.keys(itemsNeeded).filter(i => !itemsNeeded[i]);
-    console.log(missingItems);
     if (missingItems.length === 0) {
         playSfx("win");
         setTimeout(() => {
             alert("You have brought the system back online.");
             showLeaderboard();
         }, 0);
+    } else {
+        playSfx("door-locked");
     }
 }
 
+const enterCheck = {
+    "w": "bottom",
+    "a": "right",
+    "s": "top",
+    "d": "left",
+};
 const handlePlayerMove = function(event) {
-    incrementMoveCounter(1);
     const oldCell = getObjectCell(player);
-    if (event.key === "w") player.row = Math.max(0, player.row - 1);
-    else if (event.key === "a") player.col = Math.max(0, player.col - 1);
-    else if (event.key === "s") player.row = Math.min(grid.height - 1, player.row + 1);
-    else if (event.key === "d") player.col = Math.min(grid.width - 1, player.col + 1);
-    const newCell = getObjectCell(player);
-    if (oldCell != newCell) {
+    let newCellCoords = { row: player.row, col: player.col };
+    // check if can leave
+    if (event.key === "w" && oldCell.walls.indexOf("top") === -1) {
+        newCellCoords.row = player.row - 1;
+    }
+    else if (event.key === "a" && oldCell.walls.indexOf("left") === -1) {
+        newCellCoords.col = player.col - 1;
+    }
+    else if (event.key === "s" && oldCell.walls.indexOf("bottom") === -1) {
+        newCellCoords.row = player.row + 1;
+    }
+    else if (event.key === "d" && oldCell.walls.indexOf("right") === -1) {
+        newCellCoords.col = player.col + 1;
+    }
+    const newCell = getObjectCell(newCellCoords);
+    if (oldCell === newCell) return;
+    incrementMoveCounter(1);
+    // check if can enter
+    if (newCell.walls.indexOf(enterCheck[event.key]) === -1) {
+        // nothing blocking us, so move character
+        player.row = newCellCoords.row;
+        player.col = newCellCoords.col;
         arrayRemove(oldCell.items, player);
         newCell.items.push(player);
+        pickUpItems(newCell, player);
+        renderPlayer();
+    } else {
+        // we're blocked, so interact with cell instead
     }
-    pickUpItems(newCell, player);
-    renderPlayer();
     checkWin(newCell);
 };
 
@@ -168,7 +200,7 @@ const makeGrid = function(player) {
     grid.cells[getCellIndex({row:1,col:1}, grid)].items.push(makeItem(1,1,"keys",true));
     grid.cells[getCellIndex({row:0,col:6}, grid)].items.push(makeItem(0,6,"flashlight",true));
     grid.cells[getCellIndex({row:7,col:3}, grid)].items.push(makeItem(7,3,"data",true));
-    grid.cells[getCellIndex({row:0,col:0}, grid)].items.push(makeItem(0,0,"door",false,{locked:true}));
+    grid.cells[getCellIndex({row:0,col:0}, grid)].items.push(makeItem(0,0,"door",false,{blocking:true}));
     return grid;
 };
 let player = makePlayer(4, 4);
@@ -195,9 +227,22 @@ const renderLeaderboard = function() {
     body.appendChild(leaderboard.element);
 };
 
+let keypressControl = [];
+const addKeypressControl = function(handler) {
+    keypressControl.push(handler);
+};
+const removeKeypressControl = function(handler) {
+    arrayRemove(keypressControl, handler);
+};
+const handleKeypress = function(event) {
+    const handler = keypressControl[keypressControl.length - 1];
+    handler(event);
+};
+
 const startGame = function() {
     body.setAttribute("view", "game");
-    body.addEventListener("keydown", handlePlayerMove);
+    incrementMoveCounter(0);
+    introDialog.render();
 };
 
 const showLeaderboard = function() {
@@ -216,17 +261,25 @@ class Dialog {
         this.avatarElement = createElement("div", "avatar");
         this.element.appendChild(this.avatarElement);
         let clickToContinueElement = createElement("div", "click-to-continue");
-        clickToContinueElement.innerHTML = "Click to continue...";
+        clickToContinueElement.innerHTML = "Click or press space to continue...";
         this.element.appendChild(clickToContinueElement);
         this.moveTextNext();
+
+        this.inputHandler = function(event) {
+            if (event.key === " ") {
+                that.moveTextNext();
+            }
+        };
     }
 
     render() {
         body.appendChild(this.element);
+        addKeypressControl(this.inputHandler);
     }
 
     unrender() {
         unrender(this);
+        removeKeypressControl(this.inputHandler);
     }
 
     moveTextNext() {
@@ -262,8 +315,8 @@ var introDialog = new Dialog([
 const runGame = function() {
     renderGrid(grid);
     grid.element.appendChild(move_counter.element);
-    incrementMoveCounter(0);
-    introDialog.render();
+    addKeypressControl(handlePlayerMove);
+    body.addEventListener("keydown", handleKeypress);
     renderLeaderboard();
     showLeaderboard();
 };
