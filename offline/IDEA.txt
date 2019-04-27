@@ -89,3 +89,4 @@ force us to get less than 13 kb
 
 last day should be building out the primary scenario
     getting leaderboard finished
+    not clear who the player is on the first screen

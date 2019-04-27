@@ -1,11 +1,16 @@
+2019-04-26
+    --prevent you from reaching a cell with a locked door
+    desk
+    --filing cabinet
+    --the SERVER THAT"S DOWN!
+    --when you use the data it disappears from your inventory
+
 2019-04-25
-    --dmake sound when you try to interact with a locked door
+    --make sound when you try to interact with a lockedss door
     --respect walls
-    prevent you from reaching a cell with a locked door
     --conversation pauses player control
     --visually change the css to show allowed paths
     --move counter always increments when key is pressed
-    not clear who the player is on the first screen
 
 2019-04-24
     --mess with css

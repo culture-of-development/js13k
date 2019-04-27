@@ -212,6 +212,7 @@ background-image:
     /* background: purple; */
     font-size: 30px;
     text-align: center;
+    z-index: 10;
 }
 .player:before {
     content: '🧞';
@@ -232,8 +233,20 @@ background-image:
 .item.data:before {
     content: '💾';
 }
-.item.door:before {
+.item.exit:before {
     content: '🚪';
+}
+.item.system:before {
+    content: '📡';
+}
+.item.filing-cabinet:before {
+    content: '🗄️';
+}
+.item.desk:before {
+    content: '💻';
+}
+.item.couch:before {
+    content: '🛋️';
 }
 
 .inventory {

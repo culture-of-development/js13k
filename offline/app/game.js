@@ -80,43 +80,92 @@ const unrender = function(object) {
     }
 }
 
-const pickUpItems = function(cell, character) {
-    let inventoryItems = character.inventory.items;
-    let inventoryElement = character.inventory.element;
-    cell.items.forEach(item => {
-        if (!item.collectible) return;
-        item.row = 0;
-        item.col = inventoryItems.length;
-        inventoryItems.push(item);
-        unrender(item);
-        inventoryElement.appendChild(item.element);
-        playSfx(item.name);
-    });
-    inventoryItems.forEach(item => {
-        arrayRemove(cell.items, item);
-    });
-}
-
-const checkWin = function(cell) {
-    var doors = cell.items.filter(i => i.name === "door");
+const checkTerminalState = function(cell) {
+    const doors = cell.items.filter(i => i.name === "exit");
     if (doors.length === 0) return;
-    const itemsNeeded = { "keys": false, "flashlight": false, "data": false };
-    player.inventory.items.forEach(item => {
-        if (itemsNeeded.hasOwnProperty(item.name)) {
-            itemsNeeded[item.name] = true;
-        }
-    })
-    let missingItems = Object.keys(itemsNeeded).filter(i => !itemsNeeded[i]);
-    if (missingItems.length === 0) {
+    if (grid.systemItem.booted === false) {
+        alert("you must boot the system before you can exit!");
+        return;
+    }
+    const exit = doors[0];
+    if (exit.locked === false) {
         playSfx("win");
         setTimeout(() => {
             alert("You have brought the system back online.");
             showLeaderboard();
+            // TODO: show exit dialog
         }, 0);
-    } else {
-        playSfx("door-locked");
     }
 }
+const addInventoryItem = function(cell, item, character) {
+    let inventoryItems = character.inventory.items;
+    let inventoryElement = character.inventory.element;
+    item.row = 0;
+    item.col = inventoryItems.length;
+    inventoryItems.push(item);
+    unrender(item);
+    inventoryElement.appendChild(item.element);
+    playSfx(item.name);
+    arrayRemove(cell.items, item);
+    return false; // not blocking
+};
+const interactWithDoor = function(item, character) {
+    if (!item.locked) return false;
+    let keys = character.inventory.items.filter(item => item.name === "keys");
+    if (keys.length === 0) {
+        playSfx("door-locked");
+        return true;
+    }
+    item.locked = false;
+    let firstKey = keys[0];
+    unrender(firstKey);
+    delete firstKey;
+    // TODO: play unlocking sound (like a door slowly opening or something)
+    return false;
+};
+const interactWithSystem = function(item, character) {
+    if (item.booted === false) {
+        let data = character.inventory.items.filter(item => item.name === "data");
+        if (data.length === 0) {
+            alert("in order to reboot the system, you need to find the data disk");
+        } else {
+            playSfx("data");
+            item.booted = true;
+            let firstData = data[0];
+            unrender(firstData);
+            delete firstData;
+            // TODO: make it change color or something visual so you know it's done
+        }
+    }
+    return true;
+};
+const interactWithDesk = function(desk, character) {
+    // show the grid stored in the desk as a modal
+    // stop player controls and only allow clicking or esc
+    return true;
+};
+const interactWithItems = function(cell, character) {
+    let blocked = false;
+    const actions = cell.items.map(item => {
+        if (item.collectible) {
+            return () => addInventoryItem(cell, item, character);
+        } else if (item.name === "exit") {
+            return () => interactWithDoor(item, character);
+        } else if (item.name === "system") {
+            return () => interactWithSystem(item, character);
+        } else if (item.name === "filing-cabinet") {
+            return () => interactWithItems(item, character);
+        } else if (item.name === "desk") {
+            return () => interactWithDesk(item, character);
+        }
+    });
+    actions.forEach(action => {
+        if (action) {
+            blocked = blocked || action();
+        }
+    });
+    return !blocked;
+};
 
 const enterCheck = {
     "w": "bottom",
@@ -140,22 +189,23 @@ const handlePlayerMove = function(event) {
     else if (event.key === "d" && oldCell.walls.indexOf("right") === -1) {
         newCellCoords.col = player.col + 1;
     }
-    const newCell = getObjectCell(newCellCoords);
-    if (oldCell === newCell) return;
-    incrementMoveCounter(1);
-    // check if can enter
-    if (newCell.walls.indexOf(enterCheck[event.key]) === -1) {
-        // nothing blocking us, so move character
-        player.row = newCellCoords.row;
-        player.col = newCellCoords.col;
-        arrayRemove(oldCell.items, player);
-        newCell.items.push(player);
-        pickUpItems(newCell, player);
-        renderPlayer();
-    } else {
-        // we're blocked, so interact with cell instead
+    let newCell = getObjectCell(newCellCoords);
+    if (oldCell !== newCell) {
+        incrementMoveCounter(1);
+        // check if can enter
+        const canMoveThere = interactWithItems(newCell, player);
+        if (canMoveThere) {
+            // nothing blocking us, so move character
+            player.row = newCellCoords.row;
+            player.col = newCellCoords.col;
+            arrayRemove(oldCell.items, player);
+            newCell.items.push(player);
+            renderPlayer();
+        } else {
+            newCell = oldCell;
+        }
     }
-    checkWin(newCell);
+    checkTerminalState(newCell);
 };
 
 const makeItem = function(row, col, name, collectible, attributes) {
@@ -198,9 +248,14 @@ const makeGrid = function(player) {
     };
     grid.cells[getCellIndex({row:4,col:4}, grid)].items.push(player);
     grid.cells[getCellIndex({row:1,col:1}, grid)].items.push(makeItem(1,1,"keys",true));
-    grid.cells[getCellIndex({row:0,col:6}, grid)].items.push(makeItem(0,6,"flashlight",true));
-    grid.cells[getCellIndex({row:7,col:3}, grid)].items.push(makeItem(7,3,"data",true));
-    grid.cells[getCellIndex({row:0,col:0}, grid)].items.push(makeItem(0,0,"door",false,{blocking:true}));
+    grid.cells[getCellIndex({row:7,col:3}, grid)].items.push(makeItem(7,3,"flashlight",true));
+    grid.cells[getCellIndex({row:0,col:0}, grid)].items.push(makeItem(0,0,"exit",false,{locked:true}));
+    const data = makeItem(0,0,"data",true);
+    grid.cells[getCellIndex({row:0,col:6}, grid)].items.push(makeItem(0,6,"filing-cabinet",false,{items:[data]}));
+    grid.systemItem = makeItem(7,7,"system",false,{booted:false});
+    grid.cells[getCellIndex({row:7,col:7}, grid)].items.push(grid.systemItem);
+    grid.cells[getCellIndex({row:3,col:4}, grid)].items.push(makeItem(3,4,"desk",false));
+    grid.cells[getCellIndex({row:4,col:4}, grid)].items.push(makeItem(4,4,"couch",false));
     return grid;
 };
 let player = makePlayer(4, 4);
