@@ -1,3 +1,10 @@
+2019-05-01
+    --start the initial conversation when you interact with the desk
+    --get the lighting to work
+    --dont leave a trail
+    always respect the window minimum lighting
+    get better about lights around corners
+
 2019-04-26
     --prevent you from reaching a cell with a locked door
     desk
@@ -42,7 +49,6 @@
     --make the player movable
     --make a build pipeline so we can see the final size
     --make items
-    make inventory
 
 2019-04-10
     --research project

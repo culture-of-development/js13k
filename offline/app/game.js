@@ -29,6 +29,14 @@ const makeCells = function(height, width) {
                 items: [],
                 element: createElement("div", "cell"),
             };
+            if (row === 0 && col === 4) cell.element.setAttribute("light-level", "25");
+            if (row === 0 && col === 5) cell.element.setAttribute("light-level", "50");
+            if (row === 0 && col === 6) cell.element.setAttribute("light-level", "50");
+            if (row === 0 && col === 7) cell.element.setAttribute("light-level", "25");
+            if (row === 1 && col === 5) cell.element.setAttribute("light-level", "25");
+            if (row === 1 && col === 6) cell.element.setAttribute("light-level", "25");
+            cell.element.appendChild(createElement("div", "lights"));
+            cell.element.appendChild(createElement("div", "walls"));
             walls.forEach(w => cell.element.classList.add("wall-" + w));
             cells.push(cell);
         }
@@ -58,11 +66,15 @@ const renderPlayer = function() {
 
 const getCellIndex = function(object, theGrid) {
     var g = theGrid || grid;
+    if (object.row < 0 || object.row >= g.height) return null;
+    if (object.col < 0 || object.col >= g.width) return null;
     return object.row * g.width + object.col;
 };
 
 const getObjectCell = function(object) {
-    return grid.cells[getCellIndex(object)];
+    var coords = getCellIndex(object);
+    if (coords === null) return null;
+    return grid.cells[coords];
 };
 
 const arrayRemove = function(array, item) {
@@ -142,6 +154,10 @@ const interactWithSystem = function(item, character) {
 const interactWithDesk = function(desk, character) {
     // show the grid stored in the desk as a modal
     // stop player controls and only allow clicking or esc
+    if (!introDialog.pickedUp) {
+        introDialog.render();
+        introDialog.pickedUp = true;
+    }
     return true;
 };
 const interactWithItems = function(cell, character) {
@@ -167,6 +183,57 @@ const interactWithItems = function(cell, character) {
     return !blocked;
 };
 
+
+const updateLighting = function(oldCell, newCell, character) {
+    let flashlights = character.inventory.items.filter(item => item.name === "flashlight");
+    console.log(character.inventory.items);
+    if (flashlights.length === 0) return;
+    
+    let hasLeftWall = oldCell.walls.indexOf("left") != -1;
+    let hasRightWall = oldCell.walls.indexOf("right") != -1;
+    let hasTopWall = oldCell.walls.indexOf("top") != -1;
+    let hasBottomWall = oldCell.walls.indexOf("bottom") != -1;
+    let neighbor = getObjectCell({row:oldCell.row-1,col:oldCell.col-1});
+    if (neighbor && !hasLeftWall && !hasTopWall) neighbor.element.setAttribute("light-level", "25");
+    neighbor = getObjectCell({row:oldCell.row-1,col:oldCell.col-0});
+    if (neighbor && !hasTopWall) neighbor.element.setAttribute("light-level", "25");
+    neighbor = getObjectCell({row:oldCell.row-1,col:oldCell.col+1});
+    if (neighbor && !hasRightWall && !hasTopWall) neighbor.element.setAttribute("light-level", "25");
+    neighbor = getObjectCell({row:oldCell.row+1,col:oldCell.col-1});
+    if (neighbor && !hasLeftWall && !hasBottomWall) neighbor.element.setAttribute("light-level", "25");
+    neighbor = getObjectCell({row:oldCell.row+1,col:oldCell.col-0});
+    if (neighbor && !hasBottomWall) neighbor.element.setAttribute("light-level", "25");
+    neighbor = getObjectCell({row:oldCell.row+1,col:oldCell.col+1});
+    if (neighbor && !hasBottomWall && !hasRightWall) neighbor.element.setAttribute("light-level", "25");
+    neighbor = getObjectCell({row:oldCell.row-0,col:oldCell.col-1});
+    if (neighbor && !hasLeftWall) neighbor.element.setAttribute("light-level", "25");
+    neighbor = getObjectCell({row:oldCell.row-0,col:oldCell.col+1});
+    if (neighbor && !hasRightWall) neighbor.element.setAttribute("light-level", "25");
+
+    hasLeftWall = newCell.walls.indexOf("left") != -1;
+    hasRightWall = newCell.walls.indexOf("right") != -1;
+    hasTopWall = newCell.walls.indexOf("top") != -1;
+    hasBottomWall = newCell.walls.indexOf("bottom") != -1;
+    neighbor = getObjectCell({row:newCell.row-1,col:newCell.col-1});
+    if (neighbor && !hasLeftWall && !hasTopWall) neighbor.element.setAttribute("light-level", "25");
+    neighbor = getObjectCell({row:newCell.row-1,col:newCell.col-0});
+    if (neighbor && !hasTopWall) neighbor.element.setAttribute("light-level", "50");
+    neighbor = getObjectCell({row:newCell.row-1,col:newCell.col+1});
+    if (neighbor && !hasRightWall && !hasTopWall) neighbor.element.setAttribute("light-level", "25");
+    neighbor = getObjectCell({row:newCell.row+1,col:newCell.col-1});
+    if (neighbor && !hasLeftWall && !hasBottomWall) neighbor.element.setAttribute("light-level", "25");
+    neighbor = getObjectCell({row:newCell.row+1,col:newCell.col-0});
+    if (neighbor && !hasBottomWall) neighbor.element.setAttribute("light-level", "50");
+    neighbor = getObjectCell({row:newCell.row+1,col:newCell.col+1});
+    if (neighbor && !hasBottomWall && !hasRightWall) neighbor.element.setAttribute("light-level", "25");
+    neighbor = getObjectCell({row:newCell.row-0,col:newCell.col-1});
+    if (neighbor && !hasLeftWall) neighbor.element.setAttribute("light-level", "50");
+    neighbor = getObjectCell({row:newCell.row-0,col:newCell.col+1});
+    if (neighbor && !hasRightWall) neighbor.element.setAttribute("light-level", "50");
+
+    newCell.element.setAttribute("light-level", "75");
+    // roberttables subscription! first ever!
+}
 const enterCheck = {
     "w": "bottom",
     "a": "right",
@@ -205,6 +272,7 @@ const handlePlayerMove = function(event) {
             newCell = oldCell;
         }
     }
+    updateLighting(oldCell, newCell, player);
     checkTerminalState(newCell);
 };
 
@@ -246,19 +314,19 @@ const makeGrid = function(player) {
         element: createElement("div", "grid"),
         cells: makeCells(8, 8),
     };
-    grid.cells[getCellIndex({row:4,col:4}, grid)].items.push(player);
+    grid.cells[getCellIndex({row:player.row,col:player.col}, grid)].items.push(player);
     grid.cells[getCellIndex({row:1,col:1}, grid)].items.push(makeItem(1,1,"keys",true));
-    grid.cells[getCellIndex({row:7,col:3}, grid)].items.push(makeItem(7,3,"flashlight",true));
     grid.cells[getCellIndex({row:0,col:0}, grid)].items.push(makeItem(0,0,"exit",false,{locked:true}));
+    var flashlight = makeItem(0,1,"flashlight",true);
     const data = makeItem(0,0,"data",true);
-    grid.cells[getCellIndex({row:0,col:6}, grid)].items.push(makeItem(0,6,"filing-cabinet",false,{items:[data]}));
+    grid.cells[getCellIndex({row:3,col:4}, grid)].items.push(makeItem(3,4,"filing-cabinet",false,{items:[data, flashlight]}));
     grid.systemItem = makeItem(7,7,"system",false,{booted:false});
     grid.cells[getCellIndex({row:7,col:7}, grid)].items.push(grid.systemItem);
-    grid.cells[getCellIndex({row:3,col:4}, grid)].items.push(makeItem(3,4,"desk",false));
-    grid.cells[getCellIndex({row:4,col:4}, grid)].items.push(makeItem(4,4,"couch",false));
+    grid.cells[getCellIndex({row:0,col:6}, grid)].items.push(makeItem(0,6,"desk",false));
+    grid.cells[getCellIndex({row:0,col:5}, grid)].items.push(makeItem(0,5,"couch",false));
     return grid;
 };
-let player = makePlayer(4, 4);
+let player = makePlayer(0, 5);
 let grid = makeGrid(player);
 let move_counter = {
     moves: 0,
@@ -297,7 +365,7 @@ const handleKeypress = function(event) {
 const startGame = function() {
     body.setAttribute("view", "game");
     incrementMoveCounter(0);
-    introDialog.render();
+    pickUpThePhoneDialog.render();
 };
 
 const showLeaderboard = function() {
@@ -364,7 +432,11 @@ var introDialog = new Dialog([
     {side: "right", avatar: "🧞", text: "How much do we have?  What can I do about it?" },
     {side: "left", avatar: "🧔", text: "Get the system back online, you need to collect the Windows 3.1 disks from around the office and restore the OS on the main server." },
     {side: "right", avatar: "🧞", text: "But it's pitch black in here, I can't see anything.." },
-    {side: "left", avatar: "🧔", text: "There's a flashlight in my desk in the next room over, hurry up, we're counting on you!" },
+    {side: "left", avatar: "🧔", text: "There's a flashlight in the filing cabinet near your desk, hurry up, we're counting on you!" },
+]);
+
+var pickUpThePhoneDialog = new Dialog([
+    {side: "left", avatar: "☎️", text: "There's a phone on the desk ringing like crazy.  Why don't you pick it up..." },
 ]);
 
 const runGame = function() {
