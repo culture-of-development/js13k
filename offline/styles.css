@@ -3,6 +3,7 @@ body, html {
     background: #888;
     height: 100%;
     min-height: 100%;
+    overflow: hidden;
 }
 
 .leaderboard {
@@ -35,13 +36,18 @@ body[view="leaderboard"] > .leaderboard {
     display: inherit;
 }
 
+.game {
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 3;
+}
+
 .grid {
-    width: 400px;
-    height: 400px;
     top: 50%;
-    margin-top: -200px;
     left: 50%;
-    margin-left: -200px;
     position: absolute;
     line-height: 50px;
     z-index: 1;
@@ -66,7 +72,7 @@ body[view="leaderboard"] > .leaderboard {
 }
 .cell > .lights {
     z-index: 10000;
-    background: rgba(0,0,0,0.99);
+    background: rgba(0,0,0,0.85);
 }
 .cell[light-level="100"] > .lights {
     background: rgba(0,0,0,0.0);
@@ -285,6 +291,9 @@ background-image:
 }
 .item.couch:before {
     content: '🛋️';
+}
+.item.window:before {
+    content: '🗺️';
 }
 
 .inventory {

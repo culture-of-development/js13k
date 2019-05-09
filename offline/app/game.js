@@ -13,15 +13,14 @@ const createElement = function(tag, classnames) {
     return el;
 };
 
+const gameWindow = createElement("div", "game");
+body.appendChild(gameWindow);
+
 const makeCells = function(height, width) {
     let cells = [];
     for(let row = 0; row < height; row++) {
         for(let col = 0; col < width; col++) {
             let walls = [];
-            if (row === 0) walls.push("top");
-            if (row === height - 1) walls.push("bottom");
-            if (col === 0 || (col===4 && row < 6)) walls.push("left");
-            if (col === width - 1 || (col===3 && row < 6)) walls.push("right");
             let cell = {
                 row,
                 col,
@@ -29,15 +28,8 @@ const makeCells = function(height, width) {
                 items: [],
                 element: createElement("div", "cell"),
             };
-            if (row === 0 && col === 4) cell.element.setAttribute("light-level", "25");
-            if (row === 0 && col === 5) cell.element.setAttribute("light-level", "50");
-            if (row === 0 && col === 6) cell.element.setAttribute("light-level", "50");
-            if (row === 0 && col === 7) cell.element.setAttribute("light-level", "25");
-            if (row === 1 && col === 5) cell.element.setAttribute("light-level", "25");
-            if (row === 1 && col === 6) cell.element.setAttribute("light-level", "25");
             cell.element.appendChild(createElement("div", "lights"));
             cell.element.appendChild(createElement("div", "walls"));
-            walls.forEach(w => cell.element.classList.add("wall-" + w));
             cells.push(cell);
         }
     }
@@ -186,7 +178,6 @@ const interactWithItems = function(cell, character) {
 
 const updateLighting = function(oldCell, newCell, character) {
     let flashlights = character.inventory.items.filter(item => item.name === "flashlight");
-    console.log(character.inventory.items);
     if (flashlights.length === 0) return;
     
     let hasLeftWall = oldCell.walls.indexOf("left") != -1;
@@ -234,6 +225,11 @@ const updateLighting = function(oldCell, newCell, character) {
     newCell.element.setAttribute("light-level", "75");
     // roberttables subscription! first ever!
 }
+const updateCamera = function(object) {
+    let left = 50*object.col;
+    let top = 50*object.row;
+    grid.element.style.transform = "translate(-" + left + "px,-" + top + "px)";
+};
 const enterCheck = {
     "w": "bottom",
     "a": "right",
@@ -260,7 +256,19 @@ const handlePlayerMove = function(event) {
     if (oldCell !== newCell) {
         incrementMoveCounter(1);
         // check if can enter
-        const canMoveThere = interactWithItems(newCell, player);
+        let canMoveThere = interactWithItems(newCell, player);
+        if (event.key === "w" && newCell.walls.indexOf("bottom") >= 0) {
+            canMoveThere = false;
+        }
+        else if (event.key === "a" && newCell.walls.indexOf("right") >= 0) {
+            canMoveThere = false;
+        }
+        else if (event.key === "s" && newCell.walls.indexOf("top") >= 0) {
+            canMoveThere = false;
+        }
+        else if (event.key === "d" && newCell.walls.indexOf("bottom") >= 0) {
+            canMoveThere = false;
+        }
         if (canMoveThere) {
             // nothing blocking us, so move character
             player.row = newCellCoords.row;
@@ -273,6 +281,7 @@ const handlePlayerMove = function(event) {
         }
     }
     updateLighting(oldCell, newCell, player);
+    updateCamera(player);
     checkTerminalState(newCell);
 };
 
@@ -304,34 +313,118 @@ const renderCell = function(cell) {
 const renderGrid = function(grid) {
     const g = grid.element;
     grid.cells.forEach(cell => g.appendChild(renderCell(cell)));
-    body.appendChild(g);
+    gameWindow.appendChild(g);
 };
 
-const makeGrid = function(player) {
-    let grid = {
-        width: 8,
-        height: 8,
-        element: createElement("div", "grid"),
-        cells: makeCells(8, 8),
-    };
-    grid.cells[getCellIndex({row:player.row,col:player.col}, grid)].items.push(player);
-    grid.cells[getCellIndex({row:1,col:1}, grid)].items.push(makeItem(1,1,"keys",true));
-    grid.cells[getCellIndex({row:0,col:0}, grid)].items.push(makeItem(0,0,"exit",false,{locked:true}));
-    var flashlight = makeItem(0,1,"flashlight",true);
-    const data = makeItem(0,0,"data",true);
-    grid.cells[getCellIndex({row:3,col:4}, grid)].items.push(makeItem(3,4,"filing-cabinet",false,{items:[data, flashlight]}));
-    grid.systemItem = makeItem(7,7,"system",false,{booted:false});
-    grid.cells[getCellIndex({row:7,col:7}, grid)].items.push(grid.systemItem);
-    grid.cells[getCellIndex({row:0,col:6}, grid)].items.push(makeItem(0,6,"desk",false));
-    grid.cells[getCellIndex({row:0,col:5}, grid)].items.push(makeItem(0,5,"couch",false));
-    return grid;
-};
-let player = makePlayer(0, 5);
-let grid = makeGrid(player);
+function load_image(name, callback) {
+	let _temp = new Image();
+	_temp.src = name;
+	_temp.onload = callback;
+}
+let player = null;
+let grid = null;
 let move_counter = {
     moves: 0,
     element: createElement("div", "move-counter"),
 };
+const worldThings = {
+    "0": "wall", /* black */
+    "16777215": "floor", /* white */
+    "16715007": "locked-door-boss", /* light purple */
+    "11665663": "filing-cabinet", /* dark purple */
+    "65530": "unlocked-door", /* cyan */
+    "8421504": "window", /* gray */
+    "16766976": "couch", /* gold */
+    "5046016": "desk", /* green */
+    "16738816": "locked-door-security", /* orange */
+    "16711684": "system", /* red */
+    "8323182": "player", /* dark purple */
+    "4164863": "keys", /* bold blue */
+};
+const initialize_world = function(event) {
+    _temp = document.createElement('canvas');
+    _temp.width = level_width = event.target.width;
+    _temp.height = level_height = event.target.height;
+    _temp = _temp.getContext('2d')
+    _temp.drawImage(this, 0, 0);
+    _temp =_temp.getImageData(0, 0, level_width, level_height).data;
+    grid = makeGrid(level_width, level_height);
+    let filingCabinets = [];
+    for(let r = 0; r < level_height; r++) {
+        for(let c = 0; c < level_width; c++) {
+            let i = (r * level_width + c) * 4;
+            let value = (_temp[i] << 16) + (_temp[i+1] << 8) + _temp[i+2];
+            let thing = worldThings[""+value];
+            let cell = grid.cells[getCellIndex({row:r,col:c})];
+            if (thing === "wall") {
+                cell.walls = ["top", "left", "right", "bottom"];
+                cell.walls.forEach(w => cell.element.classList.add("wall-" + w));
+            } else if (thing === "locked-door-boss") {
+                cell.items.push(makeItem(r,c,"exit",false,{locked:true}));
+            } else if (thing === "filing-cabinet") {
+                var fc = makeItem(r,c,"filing-cabinet",false,{items:[]});
+                cell.items.push(fc);
+                filingCabinets.push(fc);
+            } else if (thing === "unlocked-door") {
+                cell.items.push(makeItem(r,c,"exit",false,{locked:false}));
+            } else if (thing === "window") {
+                cell.walls = ["top", "left", "right", "bottom"];
+                cell.walls.forEach(w => cell.element.classList.add("wall-" + w));
+                cell.items.push(makeItem(r,c,"window",false));
+            } else if (thing === "couch") {
+                cell.items.push(makeItem(r,c,"couch",false));
+            } else if (thing === "desk") {
+                cell.items.push(makeItem(r,c,"desk",false));
+            } else if (thing === "locked-door-security") {
+                cell.items.push(makeItem(r,c,"exit",false,{locked:true}));
+            } else if (thing === "system") {
+                grid.systemItem = makeItem(r,c,"system",false,{booted:false});
+                cell.items.push(grid.systemItem);
+            } else if (thing === "player") {
+                player = makePlayer(r, c);
+                cell.items.push(player);
+            } else if (thing === "keys") {
+                cell.items.push(makeItem(r,c,"keys",true));
+            }
+        }
+    }
+    let closest = {
+        dist: straightLineDistance(player, filingCabinets[0]),
+        fc: filingCabinets[0]
+    };
+    for(let i = 1; i < filingCabinets.length; i++) {
+        let dist = straightLineDistance(player, filingCabinets[i]);
+        if (dist < closest.dist) {
+            closest.dist = dist;
+            closest.fc = filingCabinets[i];
+        }
+    }
+    var flashlight = makeItem(0,0,"flashlight",true);
+    closest.fc.items.push(flashlight);
+    const data = makeItem(0,0,"data",true);
+    filingCabinets[getRandomInt(filingCabinets.length)].items.push(data);
+    setTimeout(runGame, 1);
+};
+const straightLineDistance = function(a, b) {
+    return Math.sqrt(Math.pow(b.row-a.row, 2) + Math.pow(b.col-a.col, 2));
+};
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/random
+function getRandomInt(max) {
+    return Math.floor(Math.random() * Math.floor(max));
+}
+
+const makeGrid = function(level_width, level_height) {
+    let grid = {
+        width: level_width,
+        height: level_height,
+        element: createElement("div", "grid"),
+        cells: makeCells(level_height, level_width),
+    };
+    grid.element.style.height = "" + (level_height*50) + "px";
+    grid.element.style.width = "" + (level_width*50) + "px";
+    return grid;
+};
+
 
 const incrementMoveCounter = function(value) {
     move_counter.moves += value;
@@ -358,6 +451,9 @@ const removeKeypressControl = function(handler) {
     arrayRemove(keypressControl, handler);
 };
 const handleKeypress = function(event) {
+    if (audioCtx) {
+        event.preventDefault();
+    }
     const handler = keypressControl[keypressControl.length - 1];
     handler(event);
 };
@@ -396,7 +492,7 @@ class Dialog {
     }
 
     render() {
-        body.appendChild(this.element);
+        gameWindow.appendChild(this.element);
         addKeypressControl(this.inputHandler);
     }
 
@@ -441,11 +537,13 @@ var pickUpThePhoneDialog = new Dialog([
 
 const runGame = function() {
     renderGrid(grid);
-    grid.element.appendChild(move_counter.element);
+    gameWindow.appendChild(move_counter.element);
+    updateCamera(player);
     addKeypressControl(handlePlayerMove);
     body.addEventListener("keydown", handleKeypress);
     renderLeaderboard();
     showLeaderboard();
 };
 
-runGame();
+//initialize_world("world.png", runGame);
+load_image("world.png", initialize_world);

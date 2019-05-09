@@ -1,3 +1,15 @@
+2019-05-09
+    --finish up drawing the board
+    --camera controller
+    door boss css etc
+    windows css etc
+    unique exit color for the terminal check
+    --can enter a wall but not leave
+    get the inventory to show up at the bottom
+
+2019-05-08
+    --get image data in javascript
+
 2019-05-01
     --start the initial conversation when you interact with the desk
     --get the lighting to work
