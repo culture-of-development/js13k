@@ -1,3 +1,8 @@
+2019-05-10
+    --compress audio using https://online-audio-converter.com/
+    --complete the build pipeline
+    make it playable on github pages
+
 2019-05-09
     --finish up drawing the board
     --camera controller

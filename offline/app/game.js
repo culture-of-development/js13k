@@ -547,3 +547,6 @@ const runGame = function() {
 
 //initialize_world("world.png", runGame);
 load_image("world.png", initialize_world);
+
+
+
